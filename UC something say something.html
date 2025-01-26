@@ -101,8 +101,9 @@
         }
 
         function placeMarker(location) {
+            const experienceType = prompt("Enter experience type (Positive or Negative):");
             const title = prompt("Enter Title:");
-            const description = prompt("Enter what made you uncomfortable:");
+            const description = prompt("Enter what made happened:");
 
             if (title && description) {
                 const timestamp = new Date().toLocaleString();

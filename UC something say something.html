@@ -16,22 +16,22 @@
             display: flex; 
             flex-direction: row; 
             height: 100vh; 
-            background-image: url('BACKGROUND2.png'); /* Set BACKGROUND2.png as the background */
-            background-size: cover; /* Make the image cover the entire background */
+            background-image: url('BACKGROUND2.png');
+            background-size: cover; 
             background-position: center;
             background-repeat: no-repeat; 
         }
     
         #map {
-            width: 50%; /* Half of the horizontal space */
-            height: 80%; /* Full height of the viewport */
+            width: 50%;
+            height: 80%;
             margin-top: 5%;
             background-size: cover;
             background-position: center;
         }
     
         #info {
-            width: 50%; /* Other half of the horizontal space */
+            width: 50%; 
             height: 100%; 
             display: flex;
             flex-direction: column;
@@ -58,7 +58,7 @@
         }
 
         .marker-info {
-            background: rgba(255, 255, 255, 0.8);
+            background:rgb(255, 176, 7);
             padding: 10px;
             margin-bottom: 10px;
             border-radius: 5px;
@@ -108,10 +108,11 @@
             if (title && description) {
                 const timestamp = new Date().toLocaleString();
                 const expirationTime = Date.now() + 5 * 60 * 60 * 1000; // 5 hours from now
-
+           
                 const marker = new google.maps.Marker({
                     position: location,
                     map: map,
+                    fillColor: color,
                 });
 
                 const infoWindow = new google.maps.InfoWindow({
@@ -209,7 +210,7 @@
 <body>
     <div id="map"></div>
     <div id="info">
-        <h1>UC SOMETHING, SAY SOMETHING</h1>
+        <h1>UC, U SAY</h1>
 
     </div>
 </body>

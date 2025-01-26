@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UCR Map</title>
+    <style>
+        @font-face {
+            font-family: 'RoSpritendo';
+            src: url('RoSpritendoSemiboldBeta-vmVwZ.otf') format('opentype');
+        }
+    
+        body {
+            margin: 0;
+            font-family: Rift, sans-serif;
+            display: flex; 
+            flex-direction: row; 
+            height: 100vh; 
+            background-image: url('BACKGROUND2.png'); /* Set BACKGROUND2.png as the background */
+            background-size: cover; /* Make the image cover the entire background */
+            background-position: center;
+            background-repeat: no-repeat; 
+        }
+    
+        #map {
+            width: 50%; /* Half of the horizontal space */
+            height: 80%; /* Full height of the viewport */
+            margin-top: 5%;
+            background-size: cover;
+            background-position: center;
+        }
+    
+        #info {
+            width: 50%; /* Other half of the horizontal space */
+            height: 100%; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-y: auto; 
+        }
+        h1 {
+            font-family: Rift, sans-serif;
+            text-align: left;
+            font-size: 2em;
+            margin: 10px 20px;
+            color: rgb(255, 176, 7);
+            position: absolute;
+            top: 10px;
+            left: 20px;
+            z-index: 100; 
+        }
+    
+        #info h1 {
+            margin-bottom: 20px;
+        }
+
+        .marker-info {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            width: 100%;
+        }
+
+        .marker-info strong {
+            font-size: 1.2em;
+        }
+    </style>
+    <script>
+        let map;
+
+        function initMap() {
+            const ucrCoords = { lat: 33.9737, lng: -117.3281 };
+
+            const mapRange = {
+                center: ucrCoords,
+                zoom: 14,
+                restriction: {
+                    latLngBounds: {
+                        north: 33.9800,
+                        south: 33.9670,
+                        west: -117.3400,
+                        east: -117.3190,
+                    },
+                    strictBounds: true,
+                },
+            };
+
+            map = new google.maps.Map(document.getElementById("map"), mapRange);
+
+            loadPins();
+
+            map.addListener("click", function (event) {
+                placeMarker(event.latLng);
+            });
+
+            setInterval(removeExpiredPins, 60000); 
+        }
+
+        function placeMarker(location) {
+            const experienceType = prompt("Enter experience type (Positive or Negative):");
+            const title = prompt("Enter Title:");
+            const description = prompt("Enter what made you happen:");
+
+        
+            if (experienceType && title && description) {
+                const timestamp = new Date().toLocaleString();
+                const expirationTime = Date.now() + 5 * 60 * 60 * 1000; // 5 hours from now
+
+                const marker = new google.maps.Marker({
+                    position: location,
+                    map: map,
+                });
+
+                const infoWindow = new google.maps.InfoWindow({
+                    content: `<div style="margin-top: 0; padding-top: 0;">
+                                <strong style="font-size: 1.2em;">${title}</strong>
+                                <p>${description}</p>
+                                <p><small>${timestamp}</small></p>
+                              </div>`,
+                });
+
+                marker.addListener("click", function () {
+                    infoWindow.open(map, marker);
+                });
+
+                storePin(location, experienceType, title, description, timestamp, expirationTime);
+
+                setTimeout(() => {
+                    marker.setMap(null);
+                    removePin(location);
+                }, 5 * 60 * 60 * 1000);
+
+                addMarkerInfo(experienceType, title, description, timestamp);
+            }
+        }
+
+        function storePin(location, experienceType, title, description, timestamp, expirationTime) {
+            const pins = JSON.parse(localStorage.getItem('pins')) || [];
+            pins.push({ lat: location.lat(), lng: location.lng(), experienceType, title, description, timestamp, expirationTime });
+            localStorage.setItem('pins', JSON.stringify(pins));
+        }
+
+        function loadPins() {
+            const pins = JSON.parse(localStorage.getItem('pins')) || [];
+            pins.forEach(pin => {
+                if (Date.now() < pin.expirationTime) {
+                    const location = new google.maps.LatLng(pin.lat, pin.lng);
+                    const marker = new google.maps.Marker({
+                        position: location,
+                        map: map,
+                    });
+
+                    const infoWindow = new google.maps.InfoWindow({
+                        content: `<div style="margin-top: 0; padding-top: 0;">
+                                    <strong style="font-size: 1.2em;">${pin.title}</strong>
+                                    <p>${pin.description}</p>
+                                    <p><small>${pin.timestamp}</small></p>
+                                  </div>`,
+                    });
+
+                    marker.addListener("click", function () {
+                        infoWindow.open(map, marker);
+                    });
+
+                    setTimeout(() => {
+                        marker.setMap(null);
+                        removePin(location);
+                    }, pin.expirationTime - Date.now());
+
+                    addMarkerInfo(pin.experienceType, pin.title, pin.description, pin.timestamp);
+                }
+            });
+        }
+
+        function removeExpiredPins() {
+            const pins = JSON.parse(localStorage.getItem('pins')) || [];
+            const updatedPins = pins.filter(pin => Date.now() < pin.expirationTime);
+            localStorage.setItem('pins', JSON.stringify(updatedPins));
+        }
+
+        function removePin(location) {
+            const pins = JSON.parse(localStorage.getItem('pins')) || [];
+            const updatedPins = pins.filter(pin => pin.lat !== location.lat() || pin.lng !== location.lng());
+            localStorage.setItem('pins', JSON.stringify(updatedPins));
+        }
+
+        function addMarkerInfo(experienceType, title, description, timestamp) {
+            const infoContainer = document.getElementById('info');
+            const markerInfo = document.createElement('div');
+            markerInfo.className = 'marker-info';
+            markerInfo.innerHTML = `<strong>${title}</strong><p>${description}</p><p><small>${timestamp}</small></p>`;
+            infoContainer.insertBefore(markerInfo, infoContainer.firstChild);
+
+            // Limit to top 4 most recent pings
+            const markerInfos = infoContainer.getElementsByClassName('marker-info');
+            if (markerInfos.length > 4) {
+                infoContainer.removeChild(markerInfos[markerInfos.length - 1]);
+            }
+        }
+    </script>
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDjmJGuhlKedHBaoPWh_enzjlXnc7lPsw8&callback=initMap"
+        defer
+    ></script>
+</head>
+<body>
+    <div id="map"></div>
+    <div id="info">
+        <h1>UC SOMETHING, SAY SOMETHING</h1>
+
+    </div>
+</body>
+</html>

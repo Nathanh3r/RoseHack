@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Website</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        h1 {
+            font-size: 3em;
+            font-weight: bold;
+        }
+        a {
+            margin-top: 10px;
+            font-size: 1.2em;
+            text-decoration: none;
+            color: blue;
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome to My Website</h1>
+    <a href="#link1">Link 1</a>
+    <a href="#link2">Link 2</a>
+    <a href="#link3">Link 3</a>
+    <a href="https://UNCOMFORTABLE.com" target="_blank">Visit My Website</a>
+</body>
+</html>
+<script>
+    const texts = [
+        { text: "Welcome to My Website", links: ["#link1", "#link2", "#link3"] },
+        { text: "Hello World", links: ["#link4", "#link5", "#link6"] },
+        { text: "Greetings!", links: ["#link7", "#link8", "#link9"] }
+    ];
+
+    const randomIndex = Math.floor(Math.random() * texts.length);
+    const selectedText = texts[randomIndex];
+
+    document.querySelector('h1').textContent = selectedText.text;
+    const links = document.querySelectorAll('a');
+    links.forEach((link, index) => {
+        link.href = selectedText.links[index];
+        link.textContent = `Link ${index + 1}`;
+    });
+</script>
+<script>
+    const facts = [
+        { fact: "1 in 3 women worldwide have experienced physical and/or sexual violence in their lifetime.", links: ["#fact1", "#fact2", "#fact3"] },
+        { fact: "Each year, 15 million girls are married before the age of 18. That is 28 girls every minute.", links: ["#fact4", "#fact5", "#fact6"] },
+        { fact: "As many as 1 in 4 women experience physical and/or sexual violence during pregnancy.", links: ["#fact7", "#fact8", "#fact9"] },
+        { fact: "58 % of new HIV infections among young persons in 2015 occurred among adolescent girls and young women. Violence or the threat of violence affect the ability of girls and young women to protect themselves from HIV.", links: ["#fact7", "#fact8", "#fact9"] },
+        { fact: "Fourty-four percent of lesbian women and 61% of bisexual women have experienced rape, physical violence, or stalking by an intimate partner. (source)", links: ["#fact7", "#fact8", "#fact9"] },
+        { fact: "Women and girls make up 96% of those trafficked for sexual exploitation.", links: ["#fact10", "#fact11", "#fact12"] },
+        { fact: "Women and girls make up 96% of those trafficked for sexual exploitation.", links: ["#fact10", "#fact11", "#fact12"] },
+
+
+
+
+
+    ];
+
+    const randomFactIndex = Math.floor(Math.random() * facts.length);
+    const selectedFact = facts[randomFactIndex];
+
+    document.querySelector('h1').textContent = selectedFact.fact;
+    const factLinks = document.querySelectorAll('a');
+    factLinks.forEach((link, index) => {
+        link.href = selectedFact.links[index];
+        link.textContent = `Link ${index + 1}`;
+    });
+</script>
